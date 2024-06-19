@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Repository
 {
-    public class CreateStockRepository : IStockRepository
+    public class CreateStockRepository : ISTockRepository
     {
         private readonly ApplicationDBContext _dbContext;
         public CreateStockRepository(ApplicationDBContext context)
         {
-            _dbContext = context;            
+            _dbContext = context;
         }
 
         public async Task<Stock?> CreateAsync(Stock stockModel)
@@ -26,7 +26,7 @@ namespace Api.Repository
             var stockModel = await _dbContext.Stocks.FirstOrDefaultAsync(x => x.Id == id);
             if (stockModel == null)
             {
-                return null; 
+                return null;
             }
             _dbContext.Stocks.Remove(stockModel);
             await _dbContext.SaveChangesAsync();
@@ -35,17 +35,17 @@ namespace Api.Repository
 
         public async Task<List<Stock>> GetAllAsync()
         {
-            return await _dbContext.Stocks.ToListAsync();
+            return await _dbContext.Stocks.Include(c => c.Comments).ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            return await _dbContext.Stocks.FindAsync(id);
+            return await _dbContext.Stocks.Include(c => c.Comments).FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto)
         {
-            var existingStock = await _dbContext.Stocks.FirstOrDefaultAsync(x=>x.Id == id);
+            var existingStock = await _dbContext.Stocks.FirstOrDefaultAsync(x => x.Id == id);
             if (existingStock == null)
             {
                 return null;
@@ -60,5 +60,6 @@ namespace Api.Repository
             await _dbContext.SaveChangesAsync();
             return existingStock;
         }
+
     }
 }
