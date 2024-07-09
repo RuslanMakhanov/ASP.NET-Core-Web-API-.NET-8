@@ -1,5 +1,6 @@
 ﻿using Api.Data;
 using Api.Dtos.Stock;
+using Api.Helpers;
 using Api.Interfaces;
 using Api.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -19,13 +20,13 @@ namespace Api.Controllers
             _dbContext = context;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var stocks = await _stockRepo.GetAllAsync();
+            var stocks = await _stockRepo.GetAllAsync(query);
             var stockDto = stocks.Select(s => s.ToStockDto());
 
             return Ok(stocks);
